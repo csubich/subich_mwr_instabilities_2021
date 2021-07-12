@@ -5,7 +5,7 @@
 
 dx = 1000;
 if (~exist('Nx','var'))
-    Nx = 257;
+    Nx = 513;
 end
 %Nx = 129;
 %Nx = 513;

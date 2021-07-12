@@ -103,8 +103,8 @@ delrbar_phi = dt*(alpha*(phiuhat_pos(2)*exp(1i*k_hill*x_phi) + ...
                        
 % Semi-Lagrangian interpolation operator and the implied derivative, which
 % is based on delr0
-[sl0_u, dsl0_u]     = interp_fourier(x_u-delr0, x_u);
-[sl0_phi, dsl0_phi] = interp_fourier(x_phi-delr0, x_phi);
+% [sl0_u, dsl0_u]     = interp_fourier(x_u-delr0, x_u);
+% [sl0_phi, dsl0_phi] = interp_fourier(x_phi-delr0, x_phi);
 % Interpolation from u to phi grid (for ua' terms in phi equations)
 [imat_u_phi] = interp_fourier(x_phi,x_u);
 
@@ -117,12 +117,12 @@ Iphi = [I Z]; Iu = [Z I];
 % Incremental semi-lagrangian operators
 
 % semilag-bar, from the mean flow
-slbar_u = -(delrbar_u.*dsl0_u); % (delrbar * f_x(x-delr0)
-slbar_phi = -(delrbar_phi.*dsl0_phi);
+% slbar_u = -(delrbar_u.*dsl0_u); % (delrbar * f_x(x-delr0)
+% slbar_phi = -(delrbar_phi.*dsl0_phi);
 
-% [sl0_u, dsl0_u] = interp_fourier(x_u - (delr0 + delrbar_u), x_u);
-% [sl0_phi, dsl0_phi] = interp_fourier(x_phi - (delr0 + delrbar_phi), x_phi);
-% slbar_u = 0; slbar_phi = 0;
+[sl0_u, dsl0_u] = interp_fourier(x_u - (delr0 + delrbar_u), x_u);
+[sl0_phi, dsl0_phi] = interp_fourier(x_phi - (delr0 + delrbar_phi), x_phi);
+slbar_u = 0; slbar_phi = 0;
 
 % In a compact matrix contation, semilag-prime needs to split: 
 % slp(f) = -fx(x-delr0)*u' = (-dsl0*f).*{alpha, 1-alpha}Iu

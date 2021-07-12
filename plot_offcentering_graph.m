@@ -16,7 +16,9 @@ if (~exist('plot_talk_figs','var'))
 end
 %hill_mults = [0.1;0.225;0.375;0.5;0.75;1;2.25;3.75]%;5;7.5;10];
 %hill_amps = [10 25 37.5 50 75 100 250 375];
-hill_amps = [10 20 40 60 80 100 200 400];
+%hill_amps = [10 20 40 60 80 100 200 400];
+hill_amps = logspace(1,3,11);
+mark1 = 1; mark2 = 6; mark3 = 9;
 % hill_mults = hill_amps/phi0/1.67e-2;
 num_mults = length(hill_amps);
 
@@ -48,24 +50,31 @@ ylabel('Amplification (/hr)');
 xlabel('Off-centering \alpha');
 
 plot_alpha = floor(num_alphas/2);
-text(alphas(plot_alpha),0.95*amp_factor(plot_alpha,1),...
-    sprintf('A_{hill}=%.0fm',hill_amps(1)),...
+text(alphas(plot_alpha),0.95*amp_factor(plot_alpha,mark1),...
+    sprintf('A_{hill}=%.0fm',hill_amps(mark1)),...
     'verticalalignment','top')
 
-text(alphas(plot_alpha)-0.025,1*amp_factor(plot_alpha,6),...
-    sprintf('A_{hill}=%.0fm',hill_amps(6)),...
+text(alphas(plot_alpha)-0.027,0.98*amp_factor(plot_alpha,mark2),...
+    sprintf('A_{hill}=%.0fm',hill_amps(mark2)),...
     'verticalalignment','bottom')
 
-text(alphas(plot_alpha),1.05*amp_factor(plot_alpha,end),...
-    sprintf('A_{hill}=%.0fm',hill_amps(end)),...
+text(alphas(plot_alpha),1.05*amp_factor(plot_alpha,mark3),...
+    sprintf('A_{hill}=%.0fm',hill_amps(mark3)),...
     'verticalalignment','bottom')
 
 if (plot_talk_figs)
-    title(sprintf('Growth rates, %.0f\\Deltax & C=%.2f',(2*pi/k_hill)/dx,dt*u0/dx));
+%     title(sprintf('Growth rates, %.0f\\Deltax & C=%.2f',(2*pi/k_hill)/dx,dt*u0/dx));
+%     set(gcf,'papersize',0.75*[5,3.8]);
+%     set(gcf,'paperposition',[0 0 5 3.8]*0.75);
+% 
+%     print -dpdf -painters talk_figs/fig_alphas.pdf
+
+    set(gca,'ytick',[1e-4,1e-2,1,1e2,1e4])
+    set(gca,'yticklabels',{'1+10^{-4}','1+10^{-2}','2','10^{2}','10^{4}'})
+    title('Off-centering growth rates')
     set(gcf,'papersize',0.75*[5,3.8]);
     set(gcf,'paperposition',[0 0 5 3.8]*0.75);
-
-    print -dpdf -painters talk_figs/fig_alphas.pdf
+    print -dpdf -painters pdes_figs/fig_offc_alphas.pdf
 end
 if (plot_paper_figs)
     set(gca,'ytick',[1e-4,1e-2,1,1e2,1e4])

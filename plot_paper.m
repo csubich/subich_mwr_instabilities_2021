@@ -6,10 +6,11 @@
 set(0,'defaultfigurepapersize',[5 3]);
 clear
 
-GROWTHRATE_PLOTS = 1;
+GROWTHRATE_PLOTS = 0;
 TIME_PLOTS = 1;
-ALT_SEMILAG_PLOTS = 1;
-OFFC_PLOTS = 1;
+ALT_SEMILAG_PLOTS = 0;
+OFFC_PLOTS = 0;
+TIME_CONVERGENCE = 0;
 
 %% Growth rate figure
 if GROWTHRATE_PLOTS
@@ -48,7 +49,8 @@ annotation('textarrow',pos(1)+cx*(arrow_x-rx(1)),pos(2)+cy*(arrow_y-ry(1)),...
     'String','(a)','textmargin',0.01)
 
 %% Advective spatial/temporal aliasing
-Nx = 129; % Don't need many points
+%Nx = 129; % Don't need many points
+Nx = 513;
 plotmode = 4; % Advective instability in a 2x2 layout
 CASE=1; interesting_spectra
 
@@ -69,7 +71,8 @@ annotation('textarrow',pos(1)+cx*(arrow_x-rx(1)),pos(2)+cy*(arrow_y-ry(1)),...
     'String','(b)','textmargin',0.01)
 
 %% Wave spatial aliasing
-Nx = 127;
+%Nx = 127;
+Nx = 513;
 CASE=3; 
 plotmode=2;  % 1x2 layout -- no need to plot advection
 interesting_spectra
@@ -94,7 +97,8 @@ annotation('textarrow',pos(1)+cx*(arrow_x-rx(1)),pos(2)+cy*(arrow_y-ry(1)),...
 
 %% Wave temporal aliasing
 % Two cases
-Nx = 257;
+%Nx = 257;
+Nx = 513;
 CASE=4;
 plotmode=2;
 interesting_spectra
@@ -127,7 +131,8 @@ end
 
 %% Off-centering
 if (OFFC_PLOTS)
-Nx = 257;
+%Nx = 257;
+Nx = 513;
 CASE=4;
 plotmode=0;
 interesting_spectra; close all
@@ -169,6 +174,7 @@ end
 %% Timestepping
 if TIME_PLOTS
 plotmode = 0; % No plotting spectra
+Nx = 513;
 CASE=4; interesting_spectra; close all
 
 % Baseline case: random perturbation, full nonlinear solver, no timestep
@@ -221,32 +227,55 @@ amps_0 = phi_amp;
 
 
 % Timestepping: timestep scheduling
-fprintf('Timestep scheduling\n')
-INIT='random'; SOLVER='newton';
-iter_nonlin_limit = 10;
-FINTIME=8;
-
-dtlist = [0.5 0.5 0.5 0.5 3]*dt;
-timestep;
-
-times_hop = times;
-amps_hop = phi_amp;
-
-figure(2); clf
-subplot(2,1,1)
-semilogy(times_hop/3600,amps_hop,'-','linewidth',1.5);
-hold on
-semilogy(times_0/3600,amps_0,'k--','linewidth',0.5);
-title('Perturbation growth - timestep variation')
-ylabel('Amplitude')
-
-
-xlim([0,FINTIME]);
-set(gca,'ytick',[1 10 100],'yticklabels',{'1','10','100'})
-set(gca,'xticklabels',[])
+% fprintf('Timestep scheduling\n')
+% INIT='random'; SOLVER='newton';
+% iter_nonlin_limit = 10;
+% FINTIME=8;
+% 
+% dtlist = [0.5 0.5 0.5 0.5 3]*dt;
+% timestep;
+% 
+% times_hop = times;
+% amps_hop = phi_amp;
+% 
+% figure(2); clf
+% subplot(2,1,1)
+% semilogy(times_hop/3600,amps_hop,'-','linewidth',1.5);
+% hold on
+% semilogy(times_0/3600,amps_0,'k--','linewidth',0.5);
+% title('Perturbation growth - timestep variation')
+% ylabel('Amplitude')
+% 
+% 
+% xlim([0,FINTIME]);
+% set(gca,'ytick',[1 10 100],'yticklabels',{'1','10','100'})
+% set(gca,'xticklabels',[])
 
 
 % Semi-implicit timestepping
+
+fprintf('Truncated iterations')
+SOLVER='linear'; iter_nonlin_limit = 2;
+FINTIME=8; dtlist = dt;
+
+timestep
+times_ilin = times;
+amps_ilin = phi_amp;
+
+figure(2)
+subplot(2,1,1)
+semilogy(times_ilin/3600,amps_ilin,'-','linewidth',1.5);
+hold on
+semilogy(times_0/3600,amps_0,'k--','linewidth',0.5);
+title('Perturbation growth - iterative solve (2 iterations)')
+ylabel('Amplitude (m)')
+xlabel('Time (h)')
+
+
+xlim([0,FINTIME]);
+ylim([0.1, max(amps_0)]);
+set(gca,'ytick',[0.1 1 10 100],'yticklabels',{'0.1','1','10','100'})
+
 fprintf('Semi-implicit timestepping')
 SOLVER='linear'; iter_nonlin_limit=1;
 FINTIME=8; dtlist = dt;
@@ -255,14 +284,14 @@ timestep
 times_slin = times;
 amps_slin = phi_amp;
 
-
 figure(2)
+
 subplot(2,1,2)
 semilogy(times_slin/3600,amps_slin,'-','linewidth',1.5);
 hold on
 semilogy(times_0/3600,amps_0,'k--','linewidth',0.5);
 title('Perturbation growth - semi-implicit')
-ylabel('Amplitude')
+ylabel('Amplitude (m)')
 xlabel('Time (h)')
 
 
@@ -303,3 +332,14 @@ if ALT_SEMILAG_PLOTS
     print -dpdf -painters paper_figs/fig_growth_cubic.pdf
         
 end
+
+if TIME_CONVERGENCE
+    clear;
+    time_convergence;
+    set(gcf,'paperposition',[0 0 5 4]);
+    set(gcf,'papersize',[5 4]);
+    set(gcf,'position',[0 0 500 400])
+    print -dpdf -painters paper_figs/fig_time_convergence.pdf
+end
+    
+    

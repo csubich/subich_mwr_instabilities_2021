@@ -2,7 +2,7 @@
 
 dx = 1000;
 Nx = 513;
-%Nx = 257;
+% Nx = 257;
 Lx = dx*Nx;
 u0 = 20; % Mean velocity
 phi0 = 6000; % Mean depth
@@ -19,7 +19,7 @@ periodlist = 5:floor(Nx/3); % Number of periods of topography in domain
 
 % CFL parameters
 Ncfl = 200;
-%Ncfl = 32;
+% Ncfl = 32;
 cflmin = 0.05; cflmax = 4;
 cfl_list = cflmin + (cflmax-cflmin)*linspace(0,1,Ncfl);
 Ncfl = length(cfl_list);
@@ -34,7 +34,6 @@ ic_iters = 10;
 clearfig = 1;
 
 semilag_fn = @interp_fourier;
-% semilag_fn = @interp_linear;
 
 for aidx = 1:length(amps)
     
@@ -88,7 +87,7 @@ for aidx = 1:length(amps)
                 % factor -- if the determinant is a small fraction of this
                 % then the leading-order IC is not really a small
                 % correction to u0/phi0
-                if (abs(det(icmat)) < 0.02*k_hill^2*dt^2/4*(c^2 + u0^2))
+                if (abs(det(icmat)) < 0.01*k_hill^2*dt^2/4*(c^2 + u0^2))
 %                     phio = phi; uo = u; 
                     maxadv(idx) = NaN;
                     maxcn(idx) = NaN;
@@ -122,11 +121,14 @@ for aidx = 1:length(amps)
 %                                     imat_phi,imat_dphi,imat_u,imat_du,...
 %                                     imat_u_phi,Dx_phi,Dx_u);
             maxcn(idx) = max(abs(eig(cn_op)));
+            if (mod(idx,floor(Ncfl/10)) == 0)
+                fprintf('.')
+            end
         end
         maxcn_save(:,pidx,aidx) = maxcn;
         maxadv_save(:,pidx,aidx) = maxadv;
         ic_resids_save(:,pidx,aidx) = ic_resids;
-        fprintf('%d %g %g %g\n',periods,max(ic_resids),max(maxcn)-1,max(maxadv)-1);
+        fprintf(' %d %g %g %g\n',periods,max(ic_resids),max(maxcn)-1,max(maxadv)-1);
 %         if (length(cfl_list) > 1) 
 %             if (clearfig); clf; end
 %             semilogy(cfl_list,max(1e-16,maxadv-1),'r-',...
@@ -137,8 +139,8 @@ for aidx = 1:length(amps)
 %             axis([cflmin-1e-6 cflmax+1e-6 1e-8 1])
 %             drawnow
 %         end
-%         % Save restart file
-% %         save instab_restart
+        % Save restart file
+%         save instab_restart
     end
 end
 

@@ -1,8 +1,8 @@
-# Instabilities in the shallow-water system with semi-Lagrangian advection
+# Instabilities in the shallow-water system with a semi-Lagrangian, time-centered discretization
 
 ** Figure generating scripts **
 
-Christopher Subich, March 2021
+Christopher Subich, July 2021
 
 This repository contains the scripts necessary to regenerate the figures and data used in the above-titled paper, submitted to Monthly Weather Review in March 2021.
 
@@ -32,4 +32,5 @@ The ancillary files are:
 * `semilag_traj.m` -- Helper function to compute (iteratively) semi-Lagrangain departure points corresponding to a given velocity field
 * `show_spectrum.m` -- Helper script to calculate and plot unstable modes in a particular realization of the shallow water operator
 * `test_with_offcentering.m` -- Helper script to define an off-centered shallow water operator and compute its modes
+*  time_convergence.m -- Script to generate a sample stable/unstable comparison, with reference solution (`ode45` and Fourier spectral method), from identical initial conditions
 * `timestep.m` -- script to evaluate a shallow water case over time, to observe any instability growing

@@ -89,7 +89,8 @@ end
 if (plotmode > 0)
     figure(4);
     ax1 = subplot(2,1,1);
-    plot(x_phi/1e3,real(cn_eigvec(1:Nx,maxidx)))
+    modenorm = max(abs(cn_eigvec(1:Nx,maxidx)))
+    plot(x_phi/1e3,real(cn_eigvec(1:Nx,maxidx))/modenorm)
     title('Most unstable \phi perturbation')
     ax2 = subplot(2,1,2);
     plot(x_phi/1e3,hill_phi)
@@ -100,9 +101,11 @@ if (plotmode > 0)
     set(ax1,'xticklabel','')
     grid(ax1,'on')
     xlim(ax1,[-1 1]*Lx/2e3)
-    set(ax1,'yticklabel','')
-    set(ax2,'yticklabel','')
+    ylabel(ax1,'\phi'' (m)')
+    %set(ax1,'yticklabel','')
+    %set(ax2,'yticklabel','')
     xlabel(ax2,'x (km)')
+    ylabel(ax2,'H (m)')
     xlim(ax2,[-1 1]*Lx/2e3)
 end
 

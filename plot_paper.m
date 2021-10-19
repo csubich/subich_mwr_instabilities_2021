@@ -147,7 +147,7 @@ hold on;
 plot(1e3*[-k_hill k_hill; -k_hill k_hill],...
      min(ylim) + [0.05 0.05;.95 .95]*(max(ylim)-min(ylim)),'k--')
 hold off
-fprintf('Maximum eigenvalue (alpha = %f) is 1+%.6e\n',alpha,max(cn_eigval)-1)
+fprintf('Maximum eigenvalue (alpha = %f) is 1+%.6e\n',alpha,max(abs(cn_eigval))-1)
 
 set(gcf,'paperposition',[0 0 5 3])
 print -dpdf -painters paper_figs/fig_offc_spectrum.pdf
@@ -254,7 +254,7 @@ amps_0 = phi_amp;
 
 % Semi-implicit timestepping
 
-fprintf('Truncated iterations')
+fprintf('Truncated iterations\n')
 SOLVER='linear'; iter_nonlin_limit = 2;
 FINTIME=8; dtlist = dt;
 
@@ -276,7 +276,7 @@ xlim([0,FINTIME]);
 ylim([0.1, max(amps_0)]);
 set(gca,'ytick',[0.1 1 10 100],'yticklabels',{'0.1','1','10','100'})
 
-fprintf('Semi-implicit timestepping')
+fprintf('Iterative solve (1 iteration / semi-implicit)\n')
 SOLVER='linear'; iter_nonlin_limit=1;
 FINTIME=8; dtlist = dt;
 
@@ -290,7 +290,7 @@ subplot(2,1,2)
 semilogy(times_slin/3600,amps_slin,'-','linewidth',1.5);
 hold on
 semilogy(times_0/3600,amps_0,'k--','linewidth',0.5);
-title('Perturbation growth - semi-implicit')
+title('Iterative solve (1 iteration / semi-implicit)')
 ylabel('Amplitude (m)')
 xlabel('Time (h)')
 

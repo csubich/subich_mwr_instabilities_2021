@@ -15,3 +15,5 @@ set(cb,'ylim',[0.17 2]);
 set(cb,'ytick',[0.1761, 0.477 1 1.477 2])
 set(cb,'ticklabels',{'1.5','3','10','30','100'})
 %ylabel(cb,'Growth factor per hour')
+
+fprintf('Global maximum growth rate %.2e\n',10^max(3600*log(rates(:))/log(10)))

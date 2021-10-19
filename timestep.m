@@ -115,6 +115,7 @@ times = [];
 phi_amp = [];
 phi_max = [];
 residlog = [];
+energy = [];
 
 step = 0;
 %for step = 1:ceil(FINTIME*3600/dt)
@@ -214,6 +215,8 @@ times(step) = nowtime;
 phi_amp(step) = sqrt(mean((phia-phio).^2));
 phi_max(step) = max(abs(phia-phio));
 residlog(step) = resid_nonlin;
+usq = ua.^2;
+energy(step) = sum(0.5*(phia.*(usq + usq([2:end 1]))) + g*phia.*(2*hill_phi + phia));
 
 if (mod(step,ploteach) == 0)
     %plot(x_phi,phia-phi0,x_phi,phio-phi0);

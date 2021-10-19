@@ -44,6 +44,8 @@ dt = cfl*dx/u0;
 clear dtlist;
 timestep;
 phia_1p5 = phia;
+times_1p5 = times;
+energy_1p5 = energy;
 
 % Case 2: low CFL
 cfl = 0.5;
@@ -51,6 +53,8 @@ dt = cfl*dx/u0;
 clear dtlist;
 timestep;
 phia_0p5 = phia;
+times_0p5 = times;
+energy_0p5 = energy;
 
 % Reference case, with ode45 and spectral method
 kk = [0:floor(Nx/2) -floor(Nx/2):-1]'*2*pi/Lx;
@@ -64,6 +68,10 @@ ode_opts  = odeset('AbsTol',1e-7,'RelTol',1e-7);
 % Evaluate
 [tt, yy] = ode45(sw_rhs,[0 3600*4],[phio;uo],ode_opts);
 
+usq = yy(:,(Nx+1):end).^2;
+phi = yy(:,1:Nx);
+energy_ode = sum(phi.*usq + g*phi.*(2*hill_phi' + phi),2);
+
 % Plot
 
 subplot(3,1,1); plot(x_phi/1e3,yy(end,1:Nx)'+hill_phi);
@@ -71,11 +79,13 @@ title('ode45 reference')
 ylabel('\phi + H')
 set(gca,'xticklabels',[]);
 xlim([-Lx/2,Lx/2]/1e3);
+ylim([phi0 - 5, phi0 + 5])
 subplot(3,1,2); plot(x_phi/1e3,phia_0p5+hill_phi);
 title('Semi-Lagrangian, C=0.5');
 ylabel('\phi + H')
 set(gca,'xticklabels',[]);
 xlim([-Lx/2,Lx/2]/1e3);
+ylim([phi0 - 5, phi0 + 5])
 subplot(3,1,3); plot(x_phi/1e3,phia_1p5+hill_phi);
 title('Semi-Lagrangian, C=1.5');
 ylabel('\phi + H')

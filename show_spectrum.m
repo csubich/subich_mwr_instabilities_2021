@@ -8,6 +8,9 @@
 % The former case is more varied, since aliasing is possible between
 % upstream and downstream-propagating waves.
 
+plot_stride = 10;
+percentile = 0.50;
+
 if (~exist('plotmode','var'))
     plotmode=2;
 end
@@ -27,12 +30,37 @@ if (plotmode > 0)
         figure(3)
         subplot(2,2,2)
     end
-    plot(1e3*cn_modes(pos_phase),abs(cn_eigval(pos_phase)),'bo','markersize',4);
+    % Plot most unstable points
+    med_eigval = median(abs(cn_eigval));
+    range = max(max(abs(cn_eigval)) - med_eigval, med_eigval - min(abs(cn_eigval)));
+    max_val = med_eigval + percentile*range;
+    min_val = med_eigval - percentile*range;
+    
+    big_pos = pos_phase' & ((abs(cn_eigval) > max_val) | (abs(cn_eigval) < min_val));
+    big_neg = neg_phase' & ((abs(cn_eigval) > max_val) | (abs(cn_eigval) < min_val));
+    
+    % Plot the 10% extreme values and 1/5 of the remainder
+    plot(1e3*cn_modes(big_pos),abs(cn_eigval(big_pos)),'bo','markersize',4);
+    
     hold on
-    plot(1e3*cn_modes(neg_phase),abs(cn_eigval(neg_phase)),'r.','markersize',8);
+    plot(1e3*cn_modes(big_neg),abs(cn_eigval(big_neg)),'r.','markersize',8)
+    
+    % Sort modes to plot the remainder
+    pos_idx = find(pos_phase);
+    [~,ii] = sort(cn_modes(pos_idx));
+    pos_idx = pos_idx(ii);
+    
+    neg_idx = find(neg_phase);
+    [~,ii] = sort(cn_modes(neg_idx));
+    neg_idx = neg_idx(ii);
+    
+    plot(1e3*cn_modes(pos_idx(1:plot_stride:end)),...
+        abs(cn_eigval(pos_idx(1:plot_stride:end))),'bo','markersize',4);
+    plot(1e3*cn_modes(neg_idx(1:plot_stride:end)),...
+        abs(cn_eigval(neg_idx(1:plot_stride:end))),'r.','markersize',8);
     xlim(1e3*[-pi/dx pi/dx])
     ylim(1+[-1 1]*abs(max(abs(cn_eigval)-1)));
-    hold on;
+    
     plot(1e3*[-k_hill k_hill; -k_hill k_hill],...
          min(ylim) + [0.05 0.05;.95 .95]*(max(ylim)-min(ylim)),'k--')
     hold off
@@ -47,9 +75,13 @@ if (plotmode > 0)
         subplot(2,2,4)
     end
     % Phase angles, CN operator
-    plot(1e3*cn_modes(pos_phase),angle(cn_eigval(pos_phase)),'bo','markersize',4)
+    plot(1e3*cn_modes(big_pos),angle(cn_eigval(big_pos)),'bo','markersize',4);
     hold on
-    plot(1e3*cn_modes(neg_phase),angle(cn_eigval(neg_phase)),'r.','markersize',8);
+    plot(1e3*cn_modes(pos_idx(1:plot_stride:end)),...
+        angle(cn_eigval(pos_idx(1:plot_stride:end))),'bo','markersize',4)
+    plot(1e3*cn_modes(big_neg),angle(cn_eigval(big_neg)),'r.','markersize',8);
+    plot(1e3*cn_modes(neg_idx(1:plot_stride:end)),...
+        angle(cn_eigval(neg_idx(1:plot_stride:end))),'r.','markersize',8);
     axis([1e3*[-pi/dx pi/dx] -3.2 3.2])
     hold on;
 end
@@ -123,9 +155,23 @@ if (plotmode > 0)
         subplot(2,2,1)
     end
     % Magnitude, advective operator
-    plot(1e3*adv_modes,abs(adv_eigval),'k.','markersize',8);
-    xlim(1e3*[-pi/dx pi/dx])
+
+    med_eigval = median(abs(adv_eigval));
+    range = max(max(abs(adv_eigval)) - med_eigval, med_eigval - min(abs(adv_eigval)));
+    max_val = med_eigval + percentile*range;
+    min_val = med_eigval - percentile*range;
+    
+    big_adv = ((abs(adv_eigval) > max_val) | (abs(adv_eigval) < min_val));
+    
+    
+    [~,adv_idx] = sort(adv_modes);
+    
+    
+    plot(1e3*adv_modes(big_adv),abs(adv_eigval(big_adv)),'k.','markersize',8)
     hold on;
+    plot(1e3*adv_modes(adv_idx(1:plot_stride:end)),...
+             abs(adv_eigval(adv_idx(1:plot_stride:end))),'k.','markersize',8);
+    xlim(1e3*[-pi/dx pi/dx])
     plot(1e3*[-k_hill k_hill; -k_hill k_hill],...
          min(ylim) + [0.05 0.05;.95 .95]*(max(ylim)-min(ylim)),'k--')
     hold off
@@ -140,7 +186,10 @@ if (plotmode > 0)
         subplot(2,2,3)
     end
     % Phase angles, advective operator
-    plot(1e3*adv_modes,angle(adv_eigval),'k.','markersize',8);
+    plot(1e3*adv_modes(big_adv),angle(adv_eigval(big_adv)),'k.','markersize',8);
+    hold on
+    plot(1e3*adv_modes(adv_idx(1:plot_stride:end)),...
+             angle(adv_eigval(adv_idx(1:plot_stride:end))),'k.','markersize',8);
     axis([1e3*[-pi/dx pi/dx] -3.2 3.2])
 
     hold on;
